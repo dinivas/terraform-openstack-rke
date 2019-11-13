@@ -11,8 +11,8 @@ variable ssh_user {
   description = "SSH user name"
 }
 
-variable ssh_key {
-  description = "Path to private SSH key"
+variable bastion_ssh_key_path {
+  description = "Path to bastion private SSH key"
 }
 
 variable kubeapi_sans_list {

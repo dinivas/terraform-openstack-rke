@@ -3,12 +3,16 @@ variable cluster_prefix {
   default     = "rke"
 }
 
-variable ssh_key {
-  description = "Local path to SSH key"
+variable bastion_ssh_key_path {
+  description = "Bastion Local path to SSH key"
 }
 
-variable ssh_key_pub {
-  description = "Local path to public SSH key"
+variable host_ssh_key {
+  description = "Local path to SSH key for instance"
+}
+
+variable ssh_keypair_name {
+  description = "SSh Keypair name to use"
 }
 
 variable ssh_user {
@@ -16,8 +20,8 @@ variable ssh_user {
   default     = "ubuntu"
 }
 
-variable external_network_id {
-  description = "External network ID"
+variable network_name {
+  description = "Yhe network name to attach instances"
 }
 
 variable floating_ip_pool {
@@ -100,29 +104,4 @@ variable allowed_ingress_udp {
   type        = "list"
   description = "Allowed UDP ingress traffic"
   default     = []
-}
-
-variable cloudflare_enable {
-  description = "If true it enables Cloudflare dynamic DNS (for this to work CLOUDFLARE_EMAIL and CLOUDFLARE_TOKEN should be set in your environment)"
-  default     = false
-}
-
-variable cloudflare_domain {
-  description = "Cloudflare domain to add the DNS records to (required if enable_cloudflare=true)"
-  default     = ""
-}
-
-variable cloudflare_record_name {
-  description = "Name for the DNS records to add (these will point to the edge nodes, you typically want a wildcard)"
-  default     = "*.rke"
-}
-
-variable cloudflare_email {
-  description = "Cloudflare account email (required if enable_cloudflare=true)"
-  default     = "null"
-}
-
-variable cloudflare_api_key {
-  description = "Cloudflare API key (required if enable_cloudflare=true)"
-  default     = "null"
 }

@@ -1,6 +1,6 @@
-output "node_mappings" {
-  description = "RKE node mappings"
-  value       = ["${data.rke_node_parameter.node_mappings.*.json}"]
+output "node_rke_infos" {
+  description = "RKE node infos"
+  value       = []
 }
 
 output "public_ip_list" {
@@ -10,7 +10,7 @@ output "public_ip_list" {
 
 output "prepare_nodes_id_list" {
   description = "Prepare nodes provisioner resource ID list"
-  value       = ["${null_resource.prepare_nodes.*.id}"]
+  value       = "${null_resource.prepare_nodes.*.id}"
 }
 
 output "associate_floating_ip_id_list" {

@@ -1,15 +1,29 @@
 # Provision RKE
 resource rke_cluster "cluster" {
-  nodes_conf = ["${var.node_mappings}"]
 
-  bastion_host = {
+  ###############################################
+  # Kubernetes nodes
+  ###############################################
+
+  dynamic nodes {
+    for_each = var.node_mappings
+    content {
+      address = nodes.value.address
+      user    = nodes.value.user
+      role    = ["controlplane", "worker", "etcd"]
+      ssh_key = file("~/.ssh/id_rsa")
+    }
+  }
+
+
+  bastion_host {
     address      = "${var.ssh_bastion_host}"
     user         = "${var.ssh_user}"
-    ssh_key_path = "${var.ssh_key}"
+    ssh_key_path = "${var.bastion_ssh_key_path}"
     port         = 22
   }
 
-  ingress = {
+  ingress {
     provider = "nginx"
 
     node_selector = {
@@ -17,22 +31,35 @@ resource rke_cluster "cluster" {
     }
   }
 
-  authentication = {
+  authentication {
     strategy = "x509"
-    sans     = ["${var.kubeapi_sans_list}"]
   }
 
   ignore_docker_version = "${var.ignore_docker_version}"
 
+  system_images {
+    kubernetes                  = "rancher/hyperkube:v1.10.3-rancher2"
+    etcd                        = "rancher/coreos-etcd:v3.1.12"
+    alpine                      = "rancher/rke-tools:v0.1.9"
+    nginx_proxy                 = "rancher/rke-tools:v0.1.9"
+    cert_downloader             = "rancher/rke-tools:v0.1.9"
+    kubernetes_services_sidecar = "rancher/rke-tools:v0.1.9"
+    kube_dns                    = "rancher/k8s-dns-kube-dns-amd64:1.14.8"
+    dnsmasq                     = "rancher/k8s-dns-dnsmasq-nanny-amd64:1.14.8"
+    kube_dns_sidecar            = "rancher/k8s-dns-sidecar-amd64:1.14.8"
+    kube_dns_autoscaler         = "rancher/cluster-proportional-autoscaler-amd64:1.0.0"
+    pod_infra_container         = "rancher/pause-amd64:3.1"
+  }
+
   # Workaround: make sure resources are created and deleted in the right order
   provisioner "local-exec" {
-    command = "# ${join(",",var.rke_cluster_deps)}"
+    command = "# ${join(",", var.rke_cluster_deps)}"
   }
 }
 
 # Write YAML configs
 locals {
-  api_access       = "https://${element(var.kubeapi_sans_list,0)}:6443"
+  api_access       = "https://${element(var.kubeapi_sans_list, 0)}:6443"
   api_access_regex = "/https://\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:6443/"
 }
 
@@ -104,7 +131,7 @@ resource null_resource "tiller" {
   depends_on = ["kubernetes_cluster_role_binding.tiller"]
 
   provisioner "local-exec" {
-    environment {
+    environment = {
       KUBECONFIG = "${path.root}/kube_config_cluster.yml"
     }
 

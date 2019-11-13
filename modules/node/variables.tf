@@ -1,4 +1,4 @@
-variable count {
+variable instance_count {
   description = "Number of nodes to be created"
 }
 
@@ -18,8 +18,12 @@ variable ssh_user {
   description = "SSH user name"
 }
 
-variable ssh_key {
-  description = "Path to private SSH key"
+variable bastion_ssh_key_path {
+  description = "Bastion ssh private SSH key"
+}
+
+variable host_ssh_key {
+  description = "Host private SSH key to use"
 }
 
 variable os_ssh_keypair {
@@ -56,10 +60,9 @@ variable labels {
 }
 
 variable docker_version {
-  default = "Docker version (should be RKE-compliant: https://rancher.com/docs/rke/v0.1.x/en/os/#software)"
+  description = "Docker version (should be RKE-compliant: https://rancher.com/docs/rke/v0.1.x/en/os/#software)"
 }
 
 variable ssh_bastion_host {
-  default = "Bastion SSH host (mandatory if assign_floating_ip is false)"
-  default = ""
+  description = "Bastion SSH host (mandatory if assign_floating_ip is false)"
 }
